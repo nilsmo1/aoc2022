@@ -7,4 +7,4 @@ fi
 mkdir day$D; cd day$D
 touch sample;
 cp ../template $D.py
-curl -o puzzle-input -b 'session=?' https://adventofcode.com/2021/day/$1/input
+curl -o puzzle-input -b 'session=?' https://adventofcode.com/2022/day/$1/input

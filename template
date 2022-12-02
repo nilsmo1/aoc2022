@@ -4,17 +4,20 @@
 
 # Q2
 
+# Input
+def parse_input(file):
+    with open(file, 'r') as inp:
+        return []
+
 if __name__ == '__main__':
     # Samples
-    with open('sample', 'r') as sample:
-        sample_input = [int(line.strip()) for line in sample]
-    
+    sample_input = parse_input('sample')
+
     # Tests
     
     # Puzzle input
-    with open('puzzle-input', 'r') as RAW:
-        formatted = [int(line.strip()) for line in RAW] 
-    
+    puzzle_input = parse_input('puzzle-input')
+
     # Results
     print(f'Q1: ')
     print(f'Q2: ')

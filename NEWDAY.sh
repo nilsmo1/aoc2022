@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+xdg-open "https://adventofcode.com/2022/day/$1" > /dev/null 2>&1
 if [ $1 -lt 10 ]; then
     D="0$1";
 else

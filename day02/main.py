@@ -47,5 +47,6 @@ if __name__ == '__main__':
     # Results
     q1 = play(puzzle_input)
     q2 = play_2(puzzle_input)
+
     print(f'Q1: {q1}')
     print(f'Q2: {q2}')

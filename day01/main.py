@@ -29,5 +29,6 @@ if __name__ == '__main__':
     # Results
     q1 = most_cals(puzzle_input)
     q2 = three_most_cals(puzzle_input)
+
     print(f'Q1: {q1}')
     print(f'Q2: {q2}')

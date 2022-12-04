@@ -46,5 +46,6 @@ if __name__ == '__main__':
     # Results
     q1 = sum_commons(puzzle_input)
     q2 = elf_badges(puzzle_input)
+
     print(f'Q1: {q1}')
     print(f'Q2: {q2}')

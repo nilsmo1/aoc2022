@@ -1,7 +1,8 @@
 # Day 2, Rock Paper Scissors
+from typing import List, Tuple
 
 # Q1
-def play(insts):
+def play(insts: List[Tuple[str, str]]) -> int:
     # A X Rock
     # B Y Paper
     # C Z Scissors
@@ -15,7 +16,7 @@ def play(insts):
     return score
 
 # Q2
-def play_2(insts):
+def play_2(insts: List[Tuple[str, str]]) -> int:
     # X Lose
     # Y Tie
     # Z Win
@@ -29,7 +30,7 @@ def play_2(insts):
     return score
 
 # Input
-def parse_input(file):
+def parse_input(file: str) -> List[Tuple[str, str]]:
     with open(file, 'r') as inp:
         return [line.strip().split() for line in inp]
 

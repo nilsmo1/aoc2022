@@ -27,3 +27,28 @@ curl -o puzzle-input -b 'session=?' https://adventofcode.com/2022/day/$1/input
 ```
 With the value of your own session cookie.
 This script only needs to run once per day, and therefore it should not cause any traffic issues.
+
+
+
+## (Side note)
+This is a (not so) fun little thing I just found out:
+```
+>>> from collections import defaultdict
+>>> c = defaultdict(list)
+>>> c[1].append(1)
+>>> c[1].append(2)
+>>> def s(k):
+...     k[1].append(2)
+... 
+>>> s(c)
+>>> c
+defaultdict(<class 'list'>, {1: [1, 2, 2]})
+>>> cc = {i: v for i, v in c.items()}
+>>> cc
+{1: [1, 2, 2]}
+>>> s(c)
+>>> c
+defaultdict(<class 'list'>, {1: [1, 2, 2, 2]})
+>>> cc
+{1: [1, 2, 2, 2]}
+```

@@ -19,9 +19,8 @@ if __name__ == '__main__':
 
     # Tests
     sample_asserts = [(7,19), (5,23), (6,23), (10,29), (11,26)]
-    for s, (sa_p1, sa_p2) in zip(sample_input, sample_asserts):
-        assert report_first_marker(s,  4) == sa_p1
-        assert report_first_marker(s, 14) == sa_p2
+    assert all(report_first_marker(s, 4) == sa_p1 and report_first_marker(s, 14) == sa_p2 for
+               s, (sa_p1, sa_p2) in zip(sample_input, sample_asserts))
 
     # Puzzle input
     puzzle_input = parse_input('puzzle-input')

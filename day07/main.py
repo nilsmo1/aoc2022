@@ -2,47 +2,41 @@
 from typing import List, Dict, Any
 
 # Q1
-#{
-# '/': [['a', 'd'], 23352670], 
-# 'a': [['e'], 94269], 
-# 'e': [[], 584], 
-# 'd': [[], 24933642]
-#}
-
 def add_subdirs(dirs: Dict[str, Any], key: str) -> Dict[str, Any]:
     q = list(dirs[key][0])
-    print(q)
     while q:
         d = q.pop()
         subdirs = dirs[d][0]
-        for subdir in subdirs:
-            q.append(subdir)
+        for subdir in subdirs: q.append(subdir)
         dirs[key][1]+=dirs[d][1]
     return dirs[key][1]
 
 def finalize(dirs: Dict[str, Any]) -> Dict[str, Any]:
-    cp = list(dirs)
-    for d in cp:
-        print(d, f'before finalize: {dirs[d][1]}')
-        dirs[d][1] = add_subdirs(dirs, d)
-        print(d, f'after finalize: {dirs[d][1]}')
-    #print(dirs)
+    for d in list(dirs): dirs[d][1] = add_subdirs(dirs, d)
     return dirs
 
 def from_cond(dirs: Dict[str, Any], threshold) -> int:
-    #for mem in dirs.values(): print(mem)
     return sum(mem[1] for mem in dirs.values() if mem[1] <= threshold) 
 
 # Q2
-
+def del_optimal_dir(dirs: Dict[str, Any]) -> int:
+    total = 70_000_000
+    root  = dirs['/'][1]
+    have  = total - root
+    need  = 30_000_000
+    min_dir = total
+    for d, [_, mem] in dirs.items():
+        if mem + have >= need: min_dir = min(min_dir, mem)
+    return min_dir
+    
 # Input
 def parse_input(file: str) -> List[str]:
     with open(file, 'r') as inp:
         return [line.strip().split() for line in inp.read().strip().splitlines()]
 
 def parse(trace: List[str]) -> Dict[str, Any]:
-    path = {}
-    dir_trace = []
+    path, dir_trace = {}, []
+    abspath = lambda dt: '/'.join(dt)
     for cmd in trace:
         match cmd:
             case ['$', 'ls']: pass
@@ -50,11 +44,11 @@ def parse(trace: List[str]) -> Dict[str, Any]:
                 dir_trace.pop()
             case ['$', 'cd', d]:
                 dir_trace.append(d)
-                path[d] = [[], 0]
+                path[abspath(dir_trace)] = [[], 0]
             case ['dir', name]:
-                path[dir_trace[-1]][0].append(name)
+                path[abspath(dir_trace)][0].append(abspath(dir_trace+[name]))
             case [size, name]:
-                path[dir_trace[-1]][1]+=int(size)
+                path[abspath(dir_trace)][1]+=int(size)
     return path
 
 if __name__ == '__main__':
@@ -65,6 +59,7 @@ if __name__ == '__main__':
 
     # Tests
     assert from_cond(sample_final, 100_000) == 95437
+    assert del_optimal_dir(sample_final)    == 24933642
 
     # Puzzle input
     puzzle_input = parse_input('puzzle-input')
@@ -73,6 +68,7 @@ if __name__ == '__main__':
 
     # Results
     q1 = from_cond(puzzle_final, 100_000)
+    q2 = del_optimal_dir(puzzle_final)
 
     print(f'Q1: {q1}')
-    print(f'Q2: ')
+    print(f'Q2: {q2}')

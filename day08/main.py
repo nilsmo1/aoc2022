@@ -1,5 +1,5 @@
 # Day 8, Treetop Tree House
-from typing import List, Tuple
+from typing import List, Tuple, Callable
 
 Map = List[List[int]]
 Potential = List[Tuple[int, int, int]]
@@ -20,7 +20,7 @@ def visible(t_map: Map, row: int, col: int, tree: int, rs: int, cs: int) -> bool
     return any(all(tree > other for other in side(t_map, rs, cs, row, col, rf, d))
                for rf, d in [(1,1), (0,1), (1,0), (0,0)])
 
-def answer(t_map: Map, func, p1: bool=False) -> int:
+def answer(t_map: Map, func: Callable[[Map, int, int, int, int, int], int], p1: bool=False) -> int:
     rs, cs, potential = init(t_map)
     vs = [func(t_map, r, c, t, rs, cs) for r, c, t in potential]
     return sum(vs) + 2*(rs + cs - 2) if p1 else max(vs)

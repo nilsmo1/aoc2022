@@ -4,41 +4,39 @@ from typing import List, Tuple
 Map = List[List[int]]
 
 # Q1
-def side(t: Map, d: Tuple[int, int], row: int, col: int) -> List[int]:
-    match d:
-        case ( _, 1): return                  t[row][col+1:]
-        case ( _,-1): return                  t[row][:col]
-        case ( 1, _): return [v[col] for v in t[row+1:]]
-        case (-1, _): return [v[col] for v in t[:row]]
-
-def visible(tree_map: Map, row: int, col: int, tree: int) -> bool:
-    return any(all(tree > other for other in side(tree_map, d, row, col))
-               for d in [(0,1), (0,-1), (1,0), (-1, 0)])
+def init(tree_map: Map) -> Tuple[int, int, Map]:
+    rs, cs = len(tree_map), len(tree_map[0])
+    return rs, cs, potentials(tree_map, rs, cs)
 
 def potentials(tree_map: Map, rs: int, cs: int) -> Map:
-    return [(row, col, tree_map[row][col])
-             for row in range(1, rs-1) for col in range(1, cs-1)]
+    return [(row, col, tree_map[row][col]) for row in range(1, rs-1) for col in range(1, cs-1)]
+
+def side(t: Map, rs: int, cs: int, row: int, col: int, row_flag: int, d: int) -> List[int]:
+    if row_flag: return [v[col] for v in t[0 if d else row+1 : row if d else rs]]
+    return t[row][0 if d else col+1 : col if d else cs]
+
+def visible(tree_map: Map, row: int, col: int, tree: int, rs: int, cs: int) -> bool:
+    return any(all(tree > other for other in side(tree_map, rs, cs, row, col, rf, d))
+               for rf, d in [(1,1), (0,1), (1,0), (0,0)])
 
 def how_many_visible(tree_map: Map) -> int:
-    rs, cs = len(tree_map), len(tree_map[0])
-    potential = potentials(tree_map, rs, cs)
-    return sum(visible(tree_map, r, c, t) for r,c,t in potential) + 2*(rs + cs - 2)
+    rs, cs, potential = init(tree_map) 
+    return sum(visible(tree_map, r, c, t, rs, cs) for r, c, t in potential) + 2*(rs + cs - 2)
 
 # Q2
-def scenic_score(tree_map: Map, row: int, col: int, tree: int) -> int:
+def scenic_score(tree_map: Map, row: int, col: int, tree: int, rs: int, cs: int) -> int:
     side_scores = {c : 0 for c in range(4)}
-    for c, d in enumerate([(0,1), (0,-1), (1,0), (-1,0)]):
-        s = side(tree_map, d, row, col)
-        for other_tree in (s[::-1] if -1 in d else s):
+    for c, (rf, d) in enumerate([(1,1), (0,1), (1,0), (0,0)]):
+        s = side(tree_map, rs, cs, row, col, rf, d)
+        for other_tree in (s[::-1] if d else s):
             side_scores[c] += 1
             if tree <= other_tree: break
     l, r, u, d = side_scores.values()
     return l * r * u * d
             
 def highest_scenic_score(tree_map: Map) -> int:
-    rs, cs = len(tree_map), len(tree_map[0])
-    potential = potentials(tree_map, rs, cs)
-    return max(scenic_score(tree_map, r, c, t) for r, c, t in potential)
+    rs, cs, potential = init(tree_map) 
+    return max(scenic_score(tree_map, r, c, t, rs, cs) for r, c, t in potential)
 
 # Input
 def parse_input(file):

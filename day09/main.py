@@ -14,17 +14,15 @@ def move_rope(moves: List[Tuple[str, int]], tails: int) -> int:
     for d, s in moves:
         for _ in range(s):
             py, px = hy, hx
-            if   d == 'R': hx+=1
-            elif d == 'L': hx-=1
-            elif d == 'D': hy+=1
-            elif d == 'U': hy-=1
+            hx += (1 if d == 'R' else -1) if d in 'RL' else 0
+            hy += (1 if d == 'U' else -1) if d in 'UD' else 0
             ny, nx = hy, hx
             for i, (y, x) in enumerate(ps):
                 ty, tx = y, x
                 neighbour = (y, x) in [(ny+dy, nx+dx) for dy in [-1,0,1] for dx in [-1,0,1]]
                 if neighbour: pass 
                 elif y != ny or x!= nx: y, x = move_to(ny, nx, y, x)
-                else: y, x = py, px
+                else:                   y, x = py, px
                 py, px, ny, nx, ps[i] = ty, tx, y, x, (y, x)
                 if i == len(ps)-1: tcs.add((y,x))
     return len(tcs)
@@ -32,7 +30,7 @@ def move_rope(moves: List[Tuple[str, int]], tails: int) -> int:
 # Input
 def parse_input(file: str) -> List[Tuple[str, int]]:
     with open(file, 'r') as inp:
-        return [(d,int(s)) for d, s in [line.split() for line in inp.read().strip().splitlines()]]
+        return [(d, int(s)) for d, s in [line.split() for line in inp.read().strip().splitlines()]]
 
 if __name__ == '__main__':
     # Samples

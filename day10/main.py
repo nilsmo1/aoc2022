@@ -14,11 +14,11 @@ def CPU_CRT(instructions: List[Instruction], CRT_flag: bool) -> Dict[int, int]:
                 inc_at_cycle[c+off+1] = int(arg)
                 off += 1
     for cycle in range(1, max(inc_at_cycle)+1):
-        if (cycle-1) % 40 == 0 and CRT_flag: print(CRT); CRT = ''
+        if (cycle-1) % 40 == 0 and CRT_flag: print(' '.join(list(CRT))); CRT = ''
         if CRT_flag: CRT += '#' if abs((cycle-1) % 40 - X) <= 1 else ' '
         if cycle in strengths: strengths[cycle] = cycle * X
         X += inc_at_cycle.get(cycle, 0)
-    if CRT_flag: print(CRT+'\n')
+    if CRT_flag: print(' '.join(list(CRT))+'\n')
     return strengths
 
 def sum_signals(instructions: List[Instruction], CRT_flag: bool) -> int:

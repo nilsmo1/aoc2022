@@ -6,14 +6,9 @@ Instruction = Union[str, List[str]]
 # Q1 & Q2
 def CPU_CRT(instructions: List[Instruction], CRT_flag: bool) -> Dict[int, int]:
     strengths, X = {20+40*i: 0 for i in range(6)}, 1
-    inc_at_cycle, off, CRT = {}, 0, ''
-    for c, inst in enumerate(instructions, start=1):
-        match inst:
-            case  'noop': pass
-            case ['addx', arg]: 
-                inc_at_cycle[c+off+1] = int(arg)
-                off += 1
-    for cycle in range(1, max(inc_at_cycle)+1):
+    off, CRT = lambda s: len([e for e in instructions[:s-1] if e[0] == 'addx']), ''
+    inc_at_cycle = {c+off(c)+1 : int(i[1]) for c, i in enumerate(instructions, start=1) if isinstance(i, list)}
+    for cycle in range(1, max(inc_at_cycle)+2):
         if (cycle-1) % 40 == 0 and CRT_flag: print(' '.join(list(CRT))); CRT = ''
         if CRT_flag: CRT += '#' if abs((cycle-1) % 40 - X) <= 1 else ' '
         if cycle in strengths: strengths[cycle] = cycle * X

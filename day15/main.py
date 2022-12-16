@@ -9,33 +9,12 @@ Pair   = Tuple[Sensor, Beacon]
 Pairs  = List[Pair]
 
 # Q1
-def flood(sensor: Sensor, beacons: Set[Beacon], founds: Set[Beacon], row: int) -> DefaultDict[int, int]:
-    nbs = lambda x, y: [(x+dx, y+dy) for dx, dy in [(-1,0), (0,1), (1, 0), (0, -1)]]
-    sx, sy = sensor
-    found = None
-    ret = 0
-    seen = set()
-    q = deque([(sx, sy)])
-    while q:
-        x, y = q.popleft()
-        ns = nbs(x,y)
-        for n in ns:
-            if n in seen: continue
-            q.append(n)
-            seen.add(n)
-            if n in beacons: 
-                ret -= 1 if n not in founds and n[1] == row else 0
-                found = n
-            else: ret += 1 if n[1] == row else 0
-        if found: break
-    return ret, found
-
 # Idea: create outer box
 """
 ---------------
-|      .      |
+|      .      | 10
 |     ...     |
-|    .....    |
+|    .....    | 
 |   .......   |
 |  .........  |
 | ........... |
@@ -53,31 +32,44 @@ def flood(sensor: Sensor, beacons: Set[Beacon], founds: Set[Beacon], row: int) -
 # marked = area of big box - 2 * 6*6 / 2 = 6*6
 # dx = 4
 # dy = 2
-# big box width = 2*dx + 1
+# big box width = 2*(dy+dx) + 1
 # big box height = 2*(dy+dx) + 1
 # marked at 10 = 
 # 0 if dto10 is outside of square
 # 1 + 2*dto10 otherwise
+def impossible_ids(p: Pair, seen: Set[int], beacons: List[Beacon], row: int) -> None:
+    (sx, sy), (bx, by) = p
+    d = abs(sx-bx) + abs(sy-by)
+    boxtop, boxbot, boxwidth = sy-d, sy+d, 2*d + 1
+    if not boxtop < row < boxbot: return
+    dtorow = abs(sy-row)
+    atrow = boxwidth - 2*dtorow 
+    seen.add(sx)
+    for x in range(1,(atrow+1)//2):
+        seen.add(sx-x)
+        seen.add(sx+x)
 
-
-def find_impossible(ps: Pairs, row: int) -> int:
-    sensors, beacons = set(p[0] for p in ps), set(p[1] for p in ps)
-    min_sx , max_sx  = min(s[0] for s in sensors), max(s[0] for s in sensors) 
-    # min_sy , max_sy  = min(s[1] for s in sensors), max(s[1] for s in sensors) 
-    min_bx , max_bx  = min(b[0] for b in beacons), max(b[0] for b in beacons) 
-    # min_by , max_by  = min(b[1] for b in beacons), max(b[1] for b in beacons) 
-    min_x  , max_x   = min(min_sx, min_bx)       , max(max_sx, max_bx)
-    # min_y  , max_y   = min(min_sy, min_by)       , max(max_sy, max_by)
-    beacons_at_row = sum(1 for x, y in beacons if y == row)
-    imps = 0
-    founds = set()
-    for s in sensors: 
-        i, f = flood(s, beacons, founds, row)
-        imps += i
-        founds.add(f)
-    return imps
+def impossibles(ps: Pairs, row: int) -> Tuple[Set[int], int]:
+    beacons = set(p[1] for p in ps)
+    seen = set()
+    for p in ps: impossible_ids(p, seen, beacons, row)
+    beacons_at_row = sum(1 for _, y in beacons if y == row)
+    return seen, len(seen) - beacons_at_row
 
 # Q2
+def tuning_frequency(ps: Pairs, low: int, high: int) -> int:
+    seen = {}
+    fresh = {(x,y) for y in range(low, high+1) for x in range(low, high+1)}
+    for y in range(low, high+1):
+        seen[y], _ = impossibles(ps, y)
+    for y, _set in seen.items():
+        for x in _set:
+            if not low <= x <= high: continue
+            fresh.remove((x, y))
+    assert len(fresh) == 1
+    bx, by = fresh.pop()
+    return bx*4_000_000 + by
+        
 
 # Input
 def parse_input(file: str) -> Pairs:
@@ -95,13 +87,16 @@ if __name__ == '__main__':
     sample_input = parse_input('sample')
 
     # Tests
-    assert find_impossible(sample_input, 10) == 26
+    assert impossibles(sample_input, 10)[1] == 26
+    assert tuning_frequency(sample_input, 0, 20) == 56_000_011
     
     # Puzzle input
     puzzle_input = parse_input('puzzle-input')
 
     # Results
-    q1 = find_impossible(puzzle_input, 2_000_000)
+    #q1 = impossibles(puzzle_input, 2_000_000)[1]
+    # q2: no smaller than 0 and no larger than 4_000_000
+    q2 = tuning_frequency(puzzle_input, 0, 4_000_000)
 
-    print(f'Q1: {q1}')
-    print(f'Q2: ')
+    # print(f'Q1: {q1}')
+    print(f'Q2: {q2}')
